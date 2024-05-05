@@ -26,3 +26,5 @@ frontend/package-lock.json
 
 # Virtual Environment
 .venv
+backend/dashview/__pycache__/*
+backend/backend/__pycache__/*

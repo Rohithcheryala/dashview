@@ -1,12 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import Preview from "./pages/Preview";
+import Edit from "./pages/Edit";
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return  <h1 className="p-4 bg-green-100">Thaggedhe lee</h1>
+  return (
+    <>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />}></Route>
+          {/* <Route path="/upload" element={}></Route> */}
+          <Route path="/dashboard">
+            <Route path=":id">
+              <Route index element={<Dashboard />}></Route>
+              <Route path="preview" element={<Preview />}></Route>
+              <Route path="edit" element={<Edit />}></Route>
+              {/* <Route path="save" element={}></Route> */}
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
 }
 
-export default App
+export default App;
