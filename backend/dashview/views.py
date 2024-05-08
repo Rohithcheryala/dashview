@@ -24,6 +24,51 @@ file = "/home/rohith/code/dashview/frontend/public/data.csv"
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
+def get_metadata(request, id):
+    df = pd.read_csv(file)
+    desc = df.describe()
+
+    df2 = df.fillna("NaN")
+    desc2 = desc.fillna("Nan")
+
+    output = []
+    def python_type(t):
+        if t == 'float64':
+            return "float"
+        elif t == 'int64':
+            return "int"
+        return "string"
+    for col in df.columns:
+        d = {
+            "name": col,
+            "data_type": python_type(df[col].dtype),
+            "null_count": int(df[col].isnull().sum()),
+        }
+
+        if d['data_type'] in ["int","float"]:
+            d.update({
+                "std": desc2.get(col, {}).get("std"),
+                "mean": desc2.get(col, {}).get("mean"),
+                "min": desc2.get(col, {}).get("min"),
+                "50%": desc2.get(col, {}).get("50%"),
+                "max": desc2.get(col, {}).get("max"),
+            })
+
+        else:
+             d.update({
+                "std": "puka",
+                "mean": "puka",
+                "min": "puka",
+                "50%": "puka",
+                "max": "puka",
+            })
+
+        output.append(d)
+
+
+    return JsonResponse({
+        "columns": output
+    })
 
 def get_dashboard_info(request, id):
     # df = pd.read_csv(file)
@@ -123,11 +168,21 @@ def preprocess_dataset(request, id):
         # file = request.FILES['file']
         file = "/home/rohith/code/dashview/frontend/public/data.csv"
         df = pd.read_csv(file)
-
         # User inputs for preprocessing
         preprocessing_options = json.loads(request.POST['preprocessing_options'])
         print(preprocessing_options)
+
+
+        for ob in preprocessing_options:
+            col_name = ob['col_name']
+            if ob['rename'] != "":
+                print("renaming")
+                df.rename(columns = {col_name: ob['rename']}, inplace = True)
+            if ob["fill_nan"] != "":
+                df[col_name] = df[col_name].fillna(ob["fill_nan"])
         
+        df.to_csv('preprocessed_dataset.csv', index=False)
+        return JsonResponse({'message': 'Dataset preprocessed successfully!'})
         # Apply preprocessing steps based on user inputs
         for option in preprocessing_options:
             if option == 'handle_missing_values':

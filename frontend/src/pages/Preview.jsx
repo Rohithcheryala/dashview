@@ -74,6 +74,7 @@ function Preview() {
     axios
       .get(`http://localhost:8000/dashview/dashboard/${dash_name}/preview`)
       .then((response) => {
+        console.log(response)
         setData(response.data);
         setLoading(false);
       })
